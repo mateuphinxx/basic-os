@@ -29,16 +29,16 @@ jobs:
         docker run --rm basicos-dev-test gcc --version
         docker run --rm basicos-dev-test make --version
         
-        # Build BasicOS
-        docker run --rm -v ${{ github.workspace }}:/workspace basicos-dev-test make all
+        # Build BasicOS with proper permissions
+        docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace --user $(id -u):$(id -g) basicos-dev-test make all
         
         # Verify binary was created and has reasonable size
-        if [ ! -f build/basicos.bin ]; then
+        if [ ! -f build_output/basicos.bin ]; then
           echo "Error: BasicOS binary not created"
           exit 1
         fi
         
-        SIZE=$(stat -c%s build/basicos.bin)
+        SIZE=$(stat -c%s build_output/basicos.bin)
         if [ $SIZE -lt 1024 ]; then
           echo "Error: Binary too small ($SIZE bytes)"
           exit 1

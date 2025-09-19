@@ -41,18 +41,18 @@ jobs:
       
     - name: Test OS binary exists
       run: |
-        if [ ! -f build/basicos.bin ]; then
+        if [ ! -f build_output/basicos.bin ]; then
           echo "Error: BasicOS binary not found!"
           exit 1
         fi
-        echo "BasicOS binary size: $(stat -c%s build/basicos.bin) bytes"
+        echo "BasicOS binary size: $(stat -c%s build_output/basicos.bin) bytes"
         
     - name: Upload BasicOS binary
       if: github.event_name == 'workflow_dispatch' && inputs.upload_artifacts == 'true'
       uses: actions/upload-artifact@v4
       with:
         name: basicos-binary
-        path: build/basicos.bin
+        path: build_output/basicos.bin
         retention-days: ${{ inputs.retention_days || '30' }}
         
     - name: Upload build artifacts
@@ -61,6 +61,6 @@ jobs:
       with:
         name: build-artifacts
         path: |
-          build/*.bin
-          build/*.o
+          build_output/*.bin
+          build_output/*.o
         retention-days: 7
