@@ -1,6 +1,26 @@
 name: Release
 
 on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag name (e.g., v1.0.0)'
+        required: true
+        type: string
+      release_name:
+        description: 'Release name (optional, defaults to tag name)'
+        required: false
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        default: false
+        type: boolean
+      draft:
+        description: 'Create as draft'
+        required: false
+        default: false
+        type: boolean
   push:
     tags:
       - 'v*'
@@ -24,34 +44,47 @@ jobs:
     - name: Build BasicOS
       run: docker run --rm -v ${{ github.workspace }}:/workspace basicos-dev make all
       
+    - name: Set release variables
+      id: vars
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "tag_name=${{ inputs.tag_name }}" >> $GITHUB_OUTPUT
+          echo "release_name=${{ inputs.release_name || inputs.tag_name }}" >> $GITHUB_OUTPUT
+        else
+          echo "tag_name=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          echo "release_name=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+        fi
+        
     - name: Create release package
       run: |
         mkdir -p release
         cp build/basicos.bin release/
         cp README.md release/
         cp setup.md release/
-        tar -czf basicos-${{ github.ref_name }}.tar.gz -C release .
+        tar -czf basicos-${{ steps.vars.outputs.tag_name }}.tar.gz -C release .
         
     - name: Generate checksums
       run: |
         cd release
         sha256sum basicos.bin > checksums.txt
         cd ..
-        sha256sum basicos-${{ github.ref_name }}.tar.gz >> release/checksums.txt
+        sha256sum basicos-${{ steps.vars.outputs.tag_name }}.tar.gz >> release/checksums.txt
         
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
+        tag_name: ${{ steps.vars.outputs.tag_name }}
+        name: ${{ steps.vars.outputs.release_name }}
         files: |
-          basicos-${{ github.ref_name }}.tar.gz
+          basicos-${{ steps.vars.outputs.tag_name }}.tar.gz
           release/basicos.bin
           release/checksums.txt
         body: |
-          ## BasicOS ${{ github.ref_name }}
+          ## BasicOS ${{ steps.vars.outputs.release_name }}
           
           ### What's Included:
           - `basicos.bin` - Ready-to-run OS image
-          - `basicos-${{ github.ref_name }}.tar.gz` - Complete package with documentation
+          - `basicos-${{ steps.vars.outputs.tag_name }}.tar.gz` - Complete package with documentation
           - `checksums.txt` - SHA256 checksums for verification
           
           ### How to Run:
@@ -69,5 +102,5 @@ jobs:
           - `echo [text]` - Display text
           - `mem` - Show memory information
           - `reboot` - Restart system
-        draft: false
-        prerelease: false
+        draft: ${{ github.event_name == 'workflow_dispatch' && inputs.draft || false }}
+        prerelease: ${{ github.event_name == 'workflow_dispatch' && inputs.prerelease || false }}
