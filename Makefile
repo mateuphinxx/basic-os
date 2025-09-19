@@ -15,38 +15,45 @@ all: $(BUILD_DIR)/basicos.bin
 $(BUILD_DIR)/basicos.bin: $(BUILD_DIR)/boot.bin $(BUILD_DIR)/kernel.bin
 	cat $(BUILD_DIR)/boot.bin $(BUILD_DIR)/kernel.bin > $(BUILD_DIR)/basicos.bin
 
-$(BUILD_DIR)/boot.bin: boot/boot.asm | $(BUILD_DIR)
+$(BUILD_DIR)/boot.bin: boot/boot.asm
+	@mkdir -p $(BUILD_DIR)
 	$(ASM) -f bin boot/boot.asm -o $(BUILD_DIR)/boot.bin
 
 $(BUILD_DIR)/kernel.bin: $(OBJECTS_ASM) $(OBJECTS_C)
+	@mkdir -p $(BUILD_DIR)
 	ld $(LDFLAGS) -o $(BUILD_DIR)/kernel.bin $(OBJECTS_ASM) $(OBJECTS_C)
 
-$(BUILD_DIR)/main.o: kernel/main.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(BUILD_DIR)/vga.o: drivers/vga.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(BUILD_DIR)/keyboard.o: drivers/keyboard.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(BUILD_DIR)/memory.o: memory/memory.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(BUILD_DIR)/idt.o: interrupts/idt.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(BUILD_DIR)/shell.o: shell/shell.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $< -o $@
-
-$(BUILD_DIR)/kernel_entry.o: kernel/kernel_entry.asm | $(BUILD_DIR)
-	$(ASM) $(ASMFLAGS) $< -o $@
-
-$(BUILD_DIR)/interrupt.o: interrupts/interrupt.asm | $(BUILD_DIR)
-	$(ASM) $(ASMFLAGS) $< -o $@
-
-$(BUILD_DIR):
+$(BUILD_DIR)/main.o: kernel/main.c
 	@mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) $< -o $@
+
+$(BUILD_DIR)/vga.o: drivers/vga.c
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) $< -o $@
+
+$(BUILD_DIR)/keyboard.o: drivers/keyboard.c
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) $< -o $@
+
+$(BUILD_DIR)/memory.o: memory/memory.c
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) $< -o $@
+
+$(BUILD_DIR)/idt.o: interrupts/idt.c
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) $< -o $@
+
+$(BUILD_DIR)/shell.o: shell/shell.c
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) $< -o $@
+
+$(BUILD_DIR)/kernel_entry.o: kernel/kernel_entry.asm
+	@mkdir -p $(BUILD_DIR)
+	$(ASM) $(ASMFLAGS) $< -o $@
+
+$(BUILD_DIR)/interrupt.o: interrupts/interrupt.asm
+	@mkdir -p $(BUILD_DIR)
+	$(ASM) $(ASMFLAGS) $< -o $@
 
 clean:
 	rm -rf $(BUILD_DIR)
