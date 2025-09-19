@@ -62,23 +62,17 @@ jobs:
       
     - name: Test individual components
       run: |
-        # Create temporary directory for test outputs
-        mkdir -p /tmp/basicos-test
-        
-        # Test bootloader compilation
-        docker run --rm -v ${{ github.workspace }}:/workspace -v /tmp/basicos-test:/tmp/test -w /workspace basicos-dev nasm -f bin boot/boot.asm -o /tmp/test/test-boot.bin
+        # Test bootloader compilation (output to /tmp inside container)
+        docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace basicos-dev sh -c "nasm -f bin boot/boot.asm -o /tmp/test-boot.bin && echo 'Bootloader test: PASS'"
         
         # Test kernel compilation
-        docker run --rm -v ${{ github.workspace }}:/workspace -v /tmp/basicos-test:/tmp/test -w /workspace basicos-dev nasm -f elf32 kernel/kernel_entry.asm -o /tmp/test/test-kernel.o
+        docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace basicos-dev sh -c "nasm -f elf32 kernel/kernel_entry.asm -o /tmp/test-kernel.o && echo 'Kernel ASM test: PASS'"
         
         # Test C compilation
-        docker run --rm -v ${{ github.workspace }}:/workspace -v /tmp/basicos-test:/tmp/test -w /workspace basicos-dev gcc -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -Wno-main -fno-zero-initialized-in-bss -fno-pic -c -I. kernel/main.c -o /tmp/test/test-main.o
+        docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace basicos-dev sh -c "gcc -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -Wno-main -fno-zero-initialized-in-bss -fno-pic -c -I. kernel/main.c -o /tmp/test-main.o && echo 'C compilation test: PASS'"
         
-        # Verify test files were created
-        ls -la /tmp/basicos-test/
-        
-        # Cleanup test files
-        rm -rf /tmp/basicos-test
+        # Test syntax only (no output files)
+        docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace basicos-dev sh -c "nasm -f bin boot/boot.asm -o /dev/null && echo 'Bootloader syntax: PASS'"
         
         echo "All component tests passed!"
 
