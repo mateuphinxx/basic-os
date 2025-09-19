@@ -11,18 +11,13 @@ on:
 jobs:
   test-build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        docker-version: ['24.0', 'latest']
         
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Set up Docker
+    - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
-      with:
-        version: ${{ matrix.docker-version }}
         
     - name: Build and test
       run: |
