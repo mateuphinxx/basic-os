@@ -16,43 +16,43 @@ $(BUILD_DIR)/basicos.bin: $(BUILD_DIR)/boot.bin $(BUILD_DIR)/kernel.bin
 	cat $(BUILD_DIR)/boot.bin $(BUILD_DIR)/kernel.bin > $(BUILD_DIR)/basicos.bin
 
 $(BUILD_DIR)/boot.bin: boot/boot.asm
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
 	$(ASM) -f bin boot/boot.asm -o $(BUILD_DIR)/boot.bin
 
 $(BUILD_DIR)/kernel.bin: $(OBJECTS_ASM) $(OBJECTS_C)
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
 	ld $(LDFLAGS) -o $(BUILD_DIR)/kernel.bin $(OBJECTS_ASM) $(OBJECTS_C)
 
 $(BUILD_DIR)/main.o: kernel/main.c
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/vga.o: drivers/vga.c
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/keyboard.o: drivers/keyboard.c
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/memory.o: memory/memory.c
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/idt.o: interrupts/idt.c
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/shell.o: shell/shell.c
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/kernel_entry.o: kernel/kernel_entry.asm
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
 	$(ASM) $(ASMFLAGS) $< -o $@
 
 $(BUILD_DIR)/interrupt.o: interrupts/interrupt.asm
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
 	$(ASM) $(ASMFLAGS) $< -o $@
 
 clean:
@@ -67,6 +67,11 @@ run-gui: $(BUILD_DIR)/basicos.bin
 debug: $(BUILD_DIR)/basicos.bin
 	qemu-system-i386 -fda $(BUILD_DIR)/basicos.bin -s -S
 
+debug-build:
+	@echo "Checking build directory..."
+	@ls -la $(BUILD_DIR) 2>/dev/null || echo "Build directory does not exist"
+	@file $(BUILD_DIR) 2>/dev/null || echo "Cannot check build directory type"
+
 copy-from-docker:
 	docker run --rm -v ${PWD}:/workspace basicos-dev make all
 	@echo "BasicOS binary copied to: build/basicos.bin"
@@ -78,4 +83,4 @@ docker-build:
 docker-shell:
 	docker run --rm -it -v ${PWD}:/workspace basicos-dev bash
 
-.PHONY: all clean run run-gui debug copy-from-docker docker-build docker-shell
+.PHONY: all clean run run-gui debug debug-build copy-from-docker docker-build docker-shell
