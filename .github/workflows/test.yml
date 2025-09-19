@@ -1,0 +1,102 @@
+name: Test BasicOS
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    - cron: '0 2 * * 1' 
+
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        docker-version: ['24.0', 'latest']
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v3
+      with:
+        version: ${{ matrix.docker-version }}
+        
+    - name: Build and test
+      run: |
+        # Build Docker image
+        docker build -t basicos-dev-test .
+        
+        # Test basic tools are available
+        docker run --rm basicos-dev-test nasm --version
+        docker run --rm basicos-dev-test gcc --version
+        docker run --rm basicos-dev-test make --version
+        
+        # Build BasicOS
+        docker run --rm -v ${{ github.workspace }}:/workspace basicos-dev-test make all
+        
+        # Verify binary was created and has reasonable size
+        if [ ! -f build/basicos.bin ]; then
+          echo "Error: BasicOS binary not created"
+          exit 1
+        fi
+        
+        SIZE=$(stat -c%s build/basicos.bin)
+        if [ $SIZE -lt 1024 ]; then
+          echo "Error: Binary too small ($SIZE bytes)"
+          exit 1
+        fi
+        
+        if [ $SIZE -gt 1048576 ]; then
+          echo "Warning: Binary quite large ($SIZE bytes)"
+        fi
+        
+        echo "Build successful! Binary size: $SIZE bytes"
+
+  test-components:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Build Docker image
+      run: docker build -t basicos-dev .
+      
+    - name: Test individual components
+      run: |
+        # Test bootloader compilation
+        docker run --rm -v ${{ github.workspace }}:/workspace basicos-dev nasm -f bin boot/boot.asm -o test-boot.bin
+        
+        # Test kernel compilation
+        docker run --rm -v ${{ github.workspace }}:/workspace basicos-dev nasm -f elf32 kernel/kernel_entry.asm -o test-kernel.o
+        
+        # Test C compilation
+        docker run --rm -v ${{ github.workspace }}:/workspace basicos-dev gcc -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -Wno-main -fno-zero-initialized-in-bss -fno-pic -c -I. kernel/main.c -o test-main.o
+        
+        # Cleanup test files
+        rm -f test-*.bin test-*.o
+        
+        echo "All component tests passed!"
+
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'ubuntu:22.04'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'

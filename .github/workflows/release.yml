@@ -1,0 +1,73 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Build Docker image
+      run: docker build -t basicos-dev .
+      
+    - name: Build BasicOS
+      run: docker run --rm -v ${{ github.workspace }}:/workspace basicos-dev make all
+      
+    - name: Create release package
+      run: |
+        mkdir -p release
+        cp build/basicos.bin release/
+        cp README.md release/
+        cp setup.md release/
+        tar -czf basicos-${{ github.ref_name }}.tar.gz -C release .
+        
+    - name: Generate checksums
+      run: |
+        cd release
+        sha256sum basicos.bin > checksums.txt
+        cd ..
+        sha256sum basicos-${{ github.ref_name }}.tar.gz >> release/checksums.txt
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          basicos-${{ github.ref_name }}.tar.gz
+          release/basicos.bin
+          release/checksums.txt
+        body: |
+          ## BasicOS ${{ github.ref_name }}
+          
+          ### What's Included:
+          - `basicos.bin` - Ready-to-run OS image
+          - `basicos-${{ github.ref_name }}.tar.gz` - Complete package with documentation
+          - `checksums.txt` - SHA256 checksums for verification
+          
+          ### How to Run:
+          ```bash
+          # With QEMU
+          qemu-system-i386 -fda basicos.bin
+          
+          # With VirtualBox
+          # Use basicos.bin as floppy disk image
+          ```
+          
+          ### Commands Available:
+          - `help` - Show available commands
+          - `clear` - Clear screen
+          - `echo [text]` - Display text
+          - `mem` - Show memory information
+          - `reboot` - Restart system
+        draft: false
+        prerelease: false
