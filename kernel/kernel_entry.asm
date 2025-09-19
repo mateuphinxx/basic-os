@@ -4,6 +4,8 @@
 [GLOBAL kernel_entry]
 
 kernel_entry:
+    mov si, debug_msg
+    call print_string
     cli
     
     lgdt [gdt_descriptor]
@@ -29,5 +31,17 @@ init_pm:
     call main
     
     jmp $
+
+print_string:
+    lodsb
+    or al, al
+    jz done
+    mov ah, 0x0E
+    int 0x10
+    jmp print_string
+done:
+    ret
+
+debug_msg db 'Kernel entry reached!', 13, 10, 0
 
 %include "kernel/gdt.asm"

@@ -1,4 +1,5 @@
 build/
+build_output/
 *.bin
 *.o
 *.tmp

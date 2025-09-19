@@ -4,7 +4,7 @@ CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfile
 LDFLAGS = -m elf_i386 -T link.ld
 ASMFLAGS = -f elf32
 
-BUILD_DIR = build
+BUILD_DIR = build_output
 SOURCES_C = kernel/main.c drivers/vga.c drivers/keyboard.c memory/memory.c interrupts/idt.c shell/shell.c
 SOURCES_ASM = kernel/kernel_entry.asm interrupts/interrupt.asm
 OBJECTS_C = $(patsubst %.c,$(BUILD_DIR)/%.o,$(notdir $(SOURCES_C)))
@@ -16,43 +16,52 @@ $(BUILD_DIR)/basicos.bin: $(BUILD_DIR)/boot.bin $(BUILD_DIR)/kernel.bin
 	cat $(BUILD_DIR)/boot.bin $(BUILD_DIR)/kernel.bin > $(BUILD_DIR)/basicos.bin
 
 $(BUILD_DIR)/boot.bin: boot/boot.asm
-	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
+	@echo "Debug: checking what 'build' is..."
+	@ls -la $(BUILD_DIR) 2>/dev/null || echo "No build entry visible"
+	@file $(BUILD_DIR) 2>/dev/null || echo "Cannot determine build type"
+	@test -f $(BUILD_DIR) && echo "build is a file" || echo "build is not a file"
+	@test -d $(BUILD_DIR) && echo "build is a directory" || echo "build is not a directory"
+	@echo "Attempting to remove any existing build..."
+	@rm -rf $(BUILD_DIR) 2>/dev/null || echo "Cannot remove build"
+	@echo "Creating build directory: $(BUILD_DIR)"
+	@mkdir -p $(BUILD_DIR)
+	@echo "Building bootloader..."
 	$(ASM) -f bin boot/boot.asm -o $(BUILD_DIR)/boot.bin
 
 $(BUILD_DIR)/kernel.bin: $(OBJECTS_ASM) $(OBJECTS_C)
-	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
+	@if [ -f $(BUILD_DIR) ]; then rm -f $(BUILD_DIR); fi; mkdir -p $(BUILD_DIR)
 	ld $(LDFLAGS) -o $(BUILD_DIR)/kernel.bin $(OBJECTS_ASM) $(OBJECTS_C)
 
 $(BUILD_DIR)/main.o: kernel/main.c
-	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
+	@if [ -f $(BUILD_DIR) ]; then rm -f $(BUILD_DIR); fi; mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/vga.o: drivers/vga.c
-	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
+	@if [ -f $(BUILD_DIR) ]; then rm -f $(BUILD_DIR); fi; mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/keyboard.o: drivers/keyboard.c
-	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
+	@if [ -f $(BUILD_DIR) ]; then rm -f $(BUILD_DIR); fi; mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/memory.o: memory/memory.c
-	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
+	@if [ -f $(BUILD_DIR) ]; then rm -f $(BUILD_DIR); fi; mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/idt.o: interrupts/idt.c
-	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
+	@if [ -f $(BUILD_DIR) ]; then rm -f $(BUILD_DIR); fi; mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/shell.o: shell/shell.c
-	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
+	@if [ -f $(BUILD_DIR) ]; then rm -f $(BUILD_DIR); fi; mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/kernel_entry.o: kernel/kernel_entry.asm
-	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
+	@if [ -f $(BUILD_DIR) ]; then rm -f $(BUILD_DIR); fi; mkdir -p $(BUILD_DIR)
 	$(ASM) $(ASMFLAGS) $< -o $@
 
 $(BUILD_DIR)/interrupt.o: interrupts/interrupt.asm
-	@mkdir -p $(BUILD_DIR) 2>/dev/null || true
+	@if [ -f $(BUILD_DIR) ]; then rm -f $(BUILD_DIR); fi; mkdir -p $(BUILD_DIR)
 	$(ASM) $(ASMFLAGS) $< -o $@
 
 clean:

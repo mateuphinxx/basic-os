@@ -1,7 +1,7 @@
 @echo off
 echo Running BasicOS...
 
-if not exist build\basicos.bin (
+if not exist build_output\basicos.bin (
     echo Error: BasicOS binary not found!
     echo Please build first using: build.bat
     echo.

@@ -6,7 +6,7 @@ wsl -e which nasm >nul 2>&1
 if %errorlevel% == 0 (
     echo Using WSL environment
     wsl make all
-    echo OS binary available at: build/basicos.bin
+    echo OS binary available at: build_output/basicos.bin
     goto :end
 )
 
@@ -20,11 +20,11 @@ if %errorlevel% == 0 (
     docker run --rm -v %CD%:/workspace basicos-dev make all
     echo.
     echo Build completed successfully!
-    echo OS binary available at: build\basicos.bin
+    echo OS binary available at: build_output\basicos.bin
     echo.
     echo To run BasicOS:
-    echo   - With QEMU: qemu-system-i386 -fda build\basicos.bin
-    echo   - With VirtualBox: Use build\basicos.bin as floppy disk
+    echo   - With QEMU: qemu-system-i386 -fda build_output\basicos.bin
+    echo   - With VirtualBox: Use build_output\basicos.bin as floppy disk
     echo.
     goto :end
 )
