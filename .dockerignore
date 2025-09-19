@@ -1,0 +1,16 @@
+build/
+*.bin
+*.o
+*.tmp
+.git/
+.gitignore
+README.md
+setup.md
+Dockerfile
+.dockerignore
+*.log
+.vscode/
+node_modules/
+*.swp
+*.swo
+*~

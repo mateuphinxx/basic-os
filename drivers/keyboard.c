@@ -1,0 +1,60 @@
+#include "keyboard.h"
+
+extern void register_interrupt_handler(unsigned char n, isr_t handler) asm("register_interrupt_handler");
+
+static char keyboard_buffer[256];
+static int buffer_start = 0;
+static int buffer_end = 0;
+
+static unsigned char keyboard_map[128] = {
+    0,  27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
+    '\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
+    0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', 0,
+    '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 0, '*', 0, ' ',
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '-', 0, 0, 0, '+', 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
+static unsigned char inb(unsigned short port) {
+    unsigned char result;
+    asm volatile("inb %%dx, %%al" : "=a"(result) : "d"(port));
+    return result;
+}
+
+void keyboard_init(void) asm("keyboard_init");
+void keyboard_init(void) {
+    register_interrupt_handler(33, keyboard_handler);
+}
+
+void keyboard_handler(registers_t regs) asm("keyboard_handler");
+void keyboard_handler(registers_t regs) {
+    (void)regs;
+    
+    unsigned char scancode = inb(KEYBOARD_DATA_PORT);
+    
+    if (scancode & 0x80) {
+        return;
+    }
+    
+    char key = keyboard_map[scancode];
+    if (key) {
+        keyboard_buffer[buffer_end] = key;
+        buffer_end = (buffer_end + 1) % 256;
+    }
+}
+
+char keyboard_getchar(void) asm("keyboard_getchar");
+char keyboard_getchar(void) {
+    while (buffer_start == buffer_end) {
+        asm volatile("hlt");
+    }
+    
+    char c = keyboard_buffer[buffer_start];
+    buffer_start = (buffer_start + 1) % 256;
+    return c;
+}
+
+int keyboard_available(void) asm("keyboard_available");
+int keyboard_available(void) {
+    return buffer_start != buffer_end;
+}

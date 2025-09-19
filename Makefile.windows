@@ -1,0 +1,35 @@
+CC = i686-elf-gcc
+ASM = nasm
+CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
+LDFLAGS = -m elf_i386 -T link.ld
+ASMFLAGS = -f elf32
+
+SOURCES_C = kernel/main.c drivers/vga.c drivers/keyboard.c memory/memory.c interrupts/idt.c shell/shell.c
+SOURCES_ASM = boot/boot.asm kernel/kernel_entry.asm interrupts/interrupt.asm
+OBJECTS_C = $(SOURCES_C:.c=.o)
+OBJECTS_ASM = $(SOURCES_ASM:.asm=.o)
+
+all: basicos.bin
+
+basicos.bin: boot/boot.bin kernel.bin
+	copy /b boot\boot.bin + kernel.bin basicos.bin
+
+boot/boot.bin: boot/boot.asm
+	$(ASM) -f bin boot/boot.asm -o boot/boot.bin
+
+kernel.bin: $(OBJECTS_ASM) $(OBJECTS_C)
+	i686-elf-ld $(LDFLAGS) -o kernel.bin $(OBJECTS_ASM) $(OBJECTS_C)
+
+%.o: %.c
+	$(CC) $(CFLAGS) $< -o $@
+
+%.o: %.asm
+	$(ASM) $(ASMFLAGS) $< -o $@
+
+clean:
+	del /q $(OBJECTS_C) $(OBJECTS_ASM) *.bin boot\*.bin kernel.bin basicos.bin
+
+run: basicos.bin
+	qemu-system-i386 -fda basicos.bin
+
+.PHONY: all clean run
