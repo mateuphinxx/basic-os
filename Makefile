@@ -68,13 +68,19 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 run: $(BUILD_DIR)/basicos.bin
-	qemu-system-i386 -fda $(BUILD_DIR)/basicos.bin -nographic
+	qemu-system-i386 -drive format=raw,file=$(BUILD_DIR)/basicos.bin,index=0,if=floppy,readonly=on -boot a -nographic -no-reboot -no-hpet -monitor none
 
 run-gui: $(BUILD_DIR)/basicos.bin
 	qemu-system-i386 -fda $(BUILD_DIR)/basicos.bin
 
 debug: $(BUILD_DIR)/basicos.bin
 	qemu-system-i386 -fda $(BUILD_DIR)/basicos.bin -s -S
+
+run-force: $(BUILD_DIR)/basicos.bin
+	qemu-system-i386 -fda $(BUILD_DIR)/basicos.bin -boot a -nographic -no-reboot -machine pc,accel=tcg -no-hpet -rtc base=localtime
+
+run-minimal: $(BUILD_DIR)/basicos.bin
+	qemu-system-i386 -drive if=floppy,format=raw,file=$(BUILD_DIR)/basicos.bin -nographic -no-reboot
 
 debug-build:
 	@echo "Checking build directory..."
