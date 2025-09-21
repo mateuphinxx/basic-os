@@ -6,9 +6,8 @@
 
 void __main(void) {}
 
-extern void idt_init(void) asm("idt_init");
+extern void idt_init(void);
 
-void main() asm("main");
 void main() {
     volatile unsigned short* vga = (unsigned short*)0xB8000;
     

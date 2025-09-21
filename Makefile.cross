@@ -53,9 +53,9 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 run: $(BUILD_DIR)/basicos.bin
-	qemu-system-i386 -fda $(BUILD_DIR)/basicos.bin
+	qemu-system-x86_64 -fda $(BUILD_DIR)/basicos.bin
 
 debug: $(BUILD_DIR)/basicos.bin
-	qemu-system-i386 -fda $(BUILD_DIR)/basicos.bin -s -S
+	qemu-system-x86_64 -fda $(BUILD_DIR)/basicos.bin -s -S
 
 .PHONY: all clean run debug

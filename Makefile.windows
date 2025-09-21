@@ -30,6 +30,6 @@ clean:
 	del /q $(OBJECTS_C) $(OBJECTS_ASM) *.bin boot\*.bin kernel.bin basicos.bin
 
 run: basicos.bin
-	qemu-system-i386 -fda basicos.bin
+	qemu-system-x86_64 -fda basicos.bin
 
 .PHONY: all clean run

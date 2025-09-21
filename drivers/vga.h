@@ -24,14 +24,14 @@ typedef enum {
     VGA_COLOR_WHITE = 15,
 } vga_color;
 
-void vga_init(void) asm("vga_init");
-void vga_clear(void) asm("vga_clear");
-void vga_putchar(char c) asm("vga_putchar");
-void vga_print(const char* str) asm("vga_print");
-void vga_print_colored(const char* str, vga_color fg, vga_color bg) asm("vga_print_colored");
-void vga_set_color(vga_color fg, vga_color bg) asm("vga_set_color");
-void vga_set_cursor(int x, int y) asm("vga_set_cursor");
-void vga_get_cursor(int* x, int* y) asm("vga_get_cursor");
-unsigned char vga_get_current_color(void) asm("vga_get_current_color");
+void vga_init(void);
+void vga_clear(void);
+void vga_putchar(char c);
+void vga_print(const char* str);
+void vga_print_colored(const char* str, vga_color fg, vga_color bg);
+void vga_set_color(vga_color fg, vga_color bg);
+void vga_set_cursor(int x, int y);
+void vga_get_cursor(int* x, int* y);
+unsigned char vga_get_current_color(void);
 
 #endif

@@ -1,14 +1,11 @@
-#include "command.h"
 #include "../drivers/vga.h"
 
-void cmd_echo(const char* args) asm("cmd_echo");
 void cmd_echo(const char* args) {
     if (*args == ' ') args++;
     vga_print(args);
     vga_print("\n");
 }
 
-void cmd_mem(const char* args) asm("cmd_mem");
 void cmd_mem(const char* args) {
     (void)args;
     

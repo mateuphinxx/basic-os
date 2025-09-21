@@ -1,4 +1,3 @@
-#include "command.h"
 #include "../drivers/vga.h"
 
 static vga_color determine_color_value(const char* color_identifier) {
@@ -24,7 +23,6 @@ static vga_color determine_color_value(const char* color_identifier) {
     return VGA_COLOR_WHITE;
 }
 
-void cmd_color(const char* args) asm("cmd_color");
 void cmd_color(const char* args) {
     char requested_color[20] = {0};
     
@@ -51,7 +49,6 @@ void cmd_color(const char* args) {
     vga_print("\n");
 }
 
-void cmd_colors(const char* args) asm("cmd_colors");
 void cmd_colors(const char* args) {
     (void)args;
     

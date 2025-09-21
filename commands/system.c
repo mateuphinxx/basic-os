@@ -1,7 +1,5 @@
-#include "command.h"
 #include "../drivers/vga.h"
 
-void cmd_clear(const char* args) asm("cmd_clear");
 void cmd_clear(const char* args) {
     (void)args;
     
@@ -10,7 +8,6 @@ void cmd_clear(const char* args) {
     vga_print("\nType 'help' for commands\n\n");
 }
 
-void cmd_reboot(const char* args) asm("cmd_reboot");
 void cmd_reboot(const char* args) {
     (void)args;
     

@@ -69,7 +69,6 @@ static void remap_irq(void) {
     asm volatile("outb %%al, %%dx" : : "d"(0xA1), "a"(0x0));
 }
 
-void idt_init(void) asm("idt_init");
 void idt_init(void) {
     idt_ptr.limit = sizeof(idt_entry_t) * IDT_ENTRIES - 1;
     idt_ptr.base = (unsigned int)&idt_entries;
@@ -138,7 +137,6 @@ void idt_init(void) {
     asm volatile("sti");
 }
 
-void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags) asm("idt_set_gate");
 void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags) {
     idt_entries[num].base_low = base & 0xFFFF;
     idt_entries[num].base_high = (base >> 16) & 0xFFFF;
@@ -147,12 +145,10 @@ void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, uns
     idt_entries[num].flags = flags;
 }
 
-void register_interrupt_handler(unsigned char n, isr_t handler) asm("register_interrupt_handler");
 void register_interrupt_handler(unsigned char n, isr_t handler) {
     interrupt_handlers[n] = handler;
 }
 
-void isr_handler(registers_t regs) asm("isr_handler");
 void isr_handler(registers_t regs) {
     if (interrupt_handlers[regs.int_no] != 0) {
         isr_t handler = interrupt_handlers[regs.int_no];
@@ -160,7 +156,6 @@ void isr_handler(registers_t regs) {
     }
 }
 
-void irq_handler(registers_t regs) asm("irq_handler");
 void irq_handler(registers_t regs) {
     if (regs.int_no >= 40) {
         asm volatile("outb %%al, %%dx" : : "d"(0xA0), "a"(0x20));

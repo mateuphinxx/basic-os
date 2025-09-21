@@ -10,10 +10,10 @@ typedef struct block {
     struct block* next;
 } block_t;
 
-void memory_init(void) asm("memory_init");
-void* malloc(unsigned int size) asm("malloc");
-void free(void* ptr) asm("free");
-void* memset(void* dest, int val, unsigned int count) asm("memset");
-void* memcpy(void* dest, const void* src, unsigned int count) asm("memcpy");
+void memory_init(void);
+void* malloc(unsigned int size);
+void free(void* ptr);
+void* memset(void* dest, int val, unsigned int count);
+void* memcpy(void* dest, const void* src, unsigned int count);
 
 #endif

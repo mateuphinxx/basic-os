@@ -22,7 +22,6 @@ static void update_cursor(int x, int y) {
     asm volatile("outb %%al, %%dx" : : "a"((unsigned char)((position >> 8) & 0xFF)), "d"(0x3D5));
 }
 
-void vga_init(void) asm("vga_init");
 void vga_init(void) {
     cursor_x = 0;
     cursor_y = 0;
@@ -35,7 +34,6 @@ void vga_init(void) {
     update_cursor(cursor_x, cursor_y);
 }
 
-void vga_clear(void) asm("vga_clear");
 void vga_clear(void) {
     for (int y = 0; y < VGA_HEIGHT; y++) {
         for (int x = 0; x < VGA_WIDTH; x++) {
@@ -48,12 +46,10 @@ void vga_clear(void) {
     update_cursor(cursor_x, cursor_y);
 }
 
-void vga_set_color(vga_color fg, vga_color bg) asm("vga_set_color");
 void vga_set_color(vga_color fg, vga_color bg) {
     current_color = vga_entry_color(fg, bg);
 }
 
-void vga_putchar(char c) asm("vga_putchar");
 void vga_putchar(char c) {
     if (c == '\n') {
         cursor_x = 0;
@@ -92,7 +88,6 @@ void vga_putchar(char c) {
     update_cursor(cursor_x, cursor_y);
 }
 
-void vga_print(const char* str) asm("vga_print");
 void vga_print(const char* str) {
     while (*str) {
         vga_putchar(*str);
@@ -100,7 +95,6 @@ void vga_print(const char* str) {
     }
 }
 
-void vga_set_cursor(int x, int y) asm("vga_set_cursor");
 void vga_set_cursor(int x, int y) {
     if (x >= 0 && x < VGA_WIDTH && y >= 0 && y < VGA_HEIGHT) {
         cursor_x = x;
@@ -109,13 +103,11 @@ void vga_set_cursor(int x, int y) {
     }
 }
 
-void vga_get_cursor(int* x, int* y) asm("vga_get_cursor");
 void vga_get_cursor(int* x, int* y) {
     if (x) *x = cursor_x;
     if (y) *y = cursor_y;
 }
 
-void vga_print_colored(const char* str, vga_color fg, vga_color bg) asm("vga_print_colored");
 void vga_print_colored(const char* str, vga_color fg, vga_color bg) {
     unsigned char old_color = current_color;
     current_color = vga_entry_color(fg, bg);
@@ -128,7 +120,6 @@ void vga_print_colored(const char* str, vga_color fg, vga_color bg) {
     current_color = old_color;
 }
 
-unsigned char vga_get_current_color(void) asm("vga_get_current_color");
 unsigned char vga_get_current_color(void) {
     return current_color;
 }

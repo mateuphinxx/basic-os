@@ -23,7 +23,7 @@ if %errorlevel% == 0 (
     echo OS binary available at: build_output\basicos.bin
     echo.
     echo To run BasicOS:
-    echo   - With QEMU: qemu-system-i386 -fda build_output\basicos.bin
+    echo   - With QEMU: qemu-system-x86_64 -fda build_output\basicos.bin
     echo   - With VirtualBox: Use build_output\basicos.bin as floppy disk
     echo.
     goto :end

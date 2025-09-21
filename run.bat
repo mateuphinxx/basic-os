@@ -10,11 +10,11 @@ if not exist build_output\basicos.bin (
 )
 
 REM Check if QEMU is available
-qemu-system-i386 --version >nul 2>&1
+qemu-system-x86_64 --version >nul 2>&1
 if %errorlevel% == 0 (
     echo Starting BasicOS with QEMU...
-    taskkill /f /im qemu-system-i386.exe >nul 2>&1
-    qemu-system-i386 -drive file=build_output\basicos.bin,format=raw,if=floppy -boot a
+    taskkill /f /im qemu-system-x86_64.exe >nul 2>&1
+    qemu-system-x86_64 -drive file=build_output\basicos.bin,format=raw,if=floppy -boot a
     goto :end
 )
 
@@ -22,7 +22,7 @@ REM Try with Docker QEMU
 docker --version >nul 2>&1
 if %errorlevel% == 0 (
     echo Starting BasicOS with Docker QEMU...
-    docker run --rm -it -v %CD%:/workspace basicos-dev qemu-system-i386 -drive file=/workspace/build_output/basicos.bin,format=raw,if=floppy -boot a -nographic
+    docker run --rm -it -v %CD%:/workspace basicos-dev qemu-system-x86_64 -fda /workspace/build_output/basicos.bin -boot a -nographic
     goto :end
 )
 

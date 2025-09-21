@@ -25,8 +25,8 @@ typedef struct {
 
 typedef void (*isr_t)(registers_t);
 
-void idt_init(void) asm("idt_init");
-void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags) asm("idt_set_gate");
-void register_interrupt_handler(unsigned char n, isr_t handler) asm("register_interrupt_handler");
+void idt_init(void);
+void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags);
+void register_interrupt_handler(unsigned char n, isr_t handler);
 
 #endif

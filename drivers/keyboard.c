@@ -1,6 +1,6 @@
 #include "keyboard.h"
 
-extern void register_interrupt_handler(unsigned char n, isr_t handler) asm("register_interrupt_handler");
+extern void register_interrupt_handler(unsigned char n, isr_t handler);
 
 static char keyboard_buffer[256];
 static int buffer_start = 0;
@@ -32,12 +32,10 @@ static unsigned char inb(unsigned short port) {
     return result;
 }
 
-void keyboard_init(void) asm("keyboard_init");
 void keyboard_init(void) {
     register_interrupt_handler(33, keyboard_handler);
 }
 
-void keyboard_handler(registers_t regs) asm("keyboard_handler");
 void keyboard_handler(registers_t regs) {
     (void)regs;
     
@@ -69,10 +67,9 @@ void keyboard_handler(registers_t regs) {
     }
 }
 
-char keyboard_getchar(void) asm("keyboard_getchar");
 char keyboard_getchar(void) {
     while (buffer_start == buffer_end) {
-        asm volatile("hlt");
+        asm volatile("sti; hlt; cli");
     }
     
     char c = keyboard_buffer[buffer_start];
@@ -80,7 +77,6 @@ char keyboard_getchar(void) {
     return c;
 }
 
-int keyboard_available(void) asm("keyboard_available");
 int keyboard_available(void) {
     return buffer_start != buffer_end;
 }

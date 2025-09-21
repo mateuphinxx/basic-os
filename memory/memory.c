@@ -2,7 +2,6 @@
 
 static block_t* heap_start = 0;
 
-void memory_init(void) asm("memory_init");
 void memory_init(void) {
     heap_start = (block_t*)HEAP_START;
     heap_start->size = HEAP_SIZE - sizeof(block_t);
@@ -10,7 +9,6 @@ void memory_init(void) {
     heap_start->next = 0;
 }
 
-void* malloc(unsigned int size) asm("malloc");
 void* malloc(unsigned int size) {
     block_t* current = heap_start;
     
@@ -33,7 +31,6 @@ void* malloc(unsigned int size) {
     return 0;
 }
 
-void free(void* ptr) asm("free");
 void free(void* ptr) {
     if (!ptr) return;
     
@@ -50,7 +47,6 @@ void free(void* ptr) {
     }
 }
 
-void* memset(void* dest, int val, unsigned int count) asm("memset");
 void* memset(void* dest, int val, unsigned int count) {
     unsigned char* temp = (unsigned char*)dest;
     for (; count != 0; count--) {
@@ -59,7 +55,6 @@ void* memset(void* dest, int val, unsigned int count) {
     return dest;
 }
 
-void* memcpy(void* dest, const void* src, unsigned int count) asm("memcpy");
 void* memcpy(void* dest, const void* src, unsigned int count) {
     const unsigned char* sp = (const unsigned char*)src;
     unsigned char* dp = (unsigned char*)dest;
