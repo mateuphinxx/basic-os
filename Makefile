@@ -72,7 +72,7 @@ run-docker: $(BUILD_DIR)/basicos.bin
 
 run-debug: $(BUILD_DIR)/basicos.bin
 	@echo "Starting BasicOS with debug info..."
-	qemu-system-i386 -drive file=$(BUILD_DIR)/basicos.bin,format=raw,if=floppy -boot a -nographic -monitor stdio -no-reboot
+	qemu-system-i386 -drive file=$(BUILD_DIR)/basicos.bin,format=raw,if=floppy -boot a -nographic -no-reboot
 
 debug-gdb: $(BUILD_DIR)/basicos.bin
 	@echo "Starting BasicOS with GDB support (run 'gdb' and 'target remote localhost:1234')..."

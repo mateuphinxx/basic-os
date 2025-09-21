@@ -15,6 +15,17 @@ static unsigned char keyboard_map[128] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
+static unsigned char keyboard_map_shift[128] = {
+    0,  27, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b',
+    '\t', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n',
+    0, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '~', 0,
+    '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', 0, '*', 0, ' ',
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '-', 0, 0, 0, '+', 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
+static int shift_pressed = 0;
+
 static unsigned char inb(unsigned short port) {
     unsigned char result;
     asm volatile("inb %%dx, %%al" : "=a"(result) : "d"(port));
@@ -33,10 +44,25 @@ void keyboard_handler(registers_t regs) {
     unsigned char scancode = inb(KEYBOARD_DATA_PORT);
     
     if (scancode & 0x80) {
+        scancode &= 0x7F;
+        if (scancode == 42 || scancode == 54) {
+            shift_pressed = 0;
+        }
         return;
     }
     
-    char key = keyboard_map[scancode];
+    if (scancode == 42 || scancode == 54) {
+        shift_pressed = 1;
+        return;
+    }
+    
+    char key;
+    if (shift_pressed) {
+        key = keyboard_map_shift[scancode];
+    } else {
+        key = keyboard_map[scancode];
+    }
+    
     if (key) {
         keyboard_buffer[buffer_end] = key;
         buffer_end = (buffer_end + 1) % 256;

@@ -19,23 +19,23 @@ void main() {
     
     vga_init();
     vga_clear();
-    vga_print("BasicOS v1.0 - Kernel Started!\n");
-    vga_print("Protected mode active...\n\n");
+    vga_print_colored("BasicOS v1.0 - Kernel Started!\n", VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLUE);
+    vga_print_colored("Protected mode active...\n\n", VGA_COLOR_WHITE, VGA_COLOR_BLUE);
     
-    vga_print("Initializing IDT...\n");
+    vga_print_colored("Initializing IDT...\n", VGA_COLOR_LIGHT_BROWN, VGA_COLOR_BLUE);
     idt_init();
-    vga_print("IDT initialized.\n");
+    vga_print_colored("IDT initialized.\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
     
-    vga_print("Initializing Memory...\n");
+    vga_print_colored("Initializing Memory...\n", VGA_COLOR_LIGHT_BROWN, VGA_COLOR_BLUE);
     memory_init();
-    vga_print("Memory initialized.\n");
+    vga_print_colored("Memory initialized.\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
     
-    vga_print("Initializing Keyboard...\n");
+    vga_print_colored("Initializing Keyboard...\n", VGA_COLOR_LIGHT_BROWN, VGA_COLOR_BLUE);
     keyboard_init();
-    vga_print("Keyboard initialized.\n\n");
+    vga_print_colored("Keyboard initialized.\n\n", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLUE);
     
-    vga_print("BasicOS Ready!\n");
-    vga_print("Starting shell...\n\n");
+    vga_print_colored("BasicOS Ready!\n", VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLUE);
+    vga_print_colored("Starting shell...\n\n", VGA_COLOR_WHITE, VGA_COLOR_BLUE);
     
     shell_init();
     shell_run();
