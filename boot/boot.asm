@@ -30,7 +30,36 @@ start:
     mov si, kernel_msg
     call print_string
 
-    jmp 0x8000
+    mov si, jump_msg
+    call print_string
+    
+    cli
+    lgdt [gdt_desc]
+    
+    mov eax, cr0
+    or eax, 1
+    mov cr0, eax
+    
+    jmp 0x08:protected_mode
+
+[BITS 32]
+protected_mode:
+    mov ax, 0x10
+    mov ds, ax
+    mov ss, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    
+    mov esp, 0x90000
+    mov ebp, esp
+    
+    mov dword [0xB8000], 0x4F4B4F4B
+    mov dword [0xB8004], 0x4F204F20
+    
+    jmp 0x08:0x8000
+
+[BITS 16]
 
 print_string:
     lodsb
@@ -153,8 +182,36 @@ disk_error:
 
 loading_msg db 'Loading BasicOS...', 13, 10, 0
 kernel_msg db 'Kernel loaded, starting...', 13, 10, 0
+jump_msg db 'Testing protected mode...', 13, 10, 0
 error_msg db 'Disk Error!', 13, 10, 0
 boot_drive db 0
+
+align 4
+gdt_desc_start:
+    dd 0x00000000
+    dd 0x00000000
+
+gdt_desc_code:
+    dw 0xFFFF
+    dw 0x0000
+    db 0x00
+    db 0x9A
+    db 0xCF
+    db 0x00
+
+gdt_desc_data:
+    dw 0xFFFF
+    dw 0x0000
+    db 0x00
+    db 0x92
+    db 0xCF
+    db 0x00
+
+gdt_desc_end:
+
+gdt_desc:
+    dw gdt_desc_end - gdt_desc_start - 1
+    dd gdt_desc_start
 
 times 510-($-$$) db 0
 dw 0xAA55

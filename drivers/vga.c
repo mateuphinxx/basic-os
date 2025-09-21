@@ -15,8 +15,13 @@ static unsigned short vga_entry(unsigned char uc, unsigned char color) {
 
 void vga_init(void) asm("vga_init");
 void vga_init(void) {
-    vga_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-    vga_clear();
+    cursor_x = 0;
+    cursor_y = 0;
+    current_color = 0x07;
+    
+    for (int i = 0; i < VGA_WIDTH * VGA_HEIGHT; i++) {
+        vga_buffer[i] = 0x0720;
+    }
 }
 
 void vga_clear(void) asm("vga_clear");
