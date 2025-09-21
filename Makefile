@@ -66,9 +66,9 @@ run: $(BUILD_DIR)/basicos.bin
 run-docker: $(BUILD_DIR)/basicos.bin
 	@echo "Starting BasicOS in Docker..."
 	@echo "File size: `wc -c < $(BUILD_DIR)/basicos.bin` bytes"
-	@cp $(BUILD_DIR)/basicos.bin /tmp/basicos_temp.bin
-	@echo "Starting QEMU..."
-	qemu-system-i386 -drive file=/tmp/basicos_temp.bin,format=raw,if=floppy,readonly=on -boot a -nographic -no-reboot
+	@echo "Starting QEMU with proper Docker settings..."
+	qemu-system-i386 -fda $(BUILD_DIR)/basicos.bin -boot a -nographic -no-reboot -enable-kvm -M pc -cpu host 2>/dev/null || \
+	qemu-system-i386 -fda $(BUILD_DIR)/basicos.bin -boot a -nographic -no-reboot -M pc
 
 run-debug: $(BUILD_DIR)/basicos.bin
 	@echo "Starting BasicOS with debug info..."

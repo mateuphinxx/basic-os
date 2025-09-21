@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  basicos-dev:
+    build: .
+    container_name: basicos-dev
+    working_dir: /workspace
+    environment:
+      - TERM=xterm-256color
+    devices:
+      - /dev/kvm:/dev/kvm
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    privileged: false
+    volumes:
+      - .:/workspace:rw
+      - /tmp:/tmp:rw
+    command: make run-docker
+    stop_grace_period: 10s
+    stdin_open: true
+    tty: true
+
+  basicos-build:
+    build: .
+    container_name: basicos-build
+    working_dir: /workspace
+    volumes:
+      - .:/workspace:rw
+    command: make all
