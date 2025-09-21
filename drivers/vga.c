@@ -26,7 +26,7 @@ void vga_init(void) asm("vga_init");
 void vga_init(void) {
     cursor_x = 0;
     cursor_y = 0;
-    current_color = 0x1F;  
+    current_color = 0x1F;
     
     for (int i = 0; i < VGA_WIDTH * VGA_HEIGHT; i++) {
         vga_buffer[i] = vga_entry(' ', current_color);

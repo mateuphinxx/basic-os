@@ -54,10 +54,10 @@ protected_mode:
     mov esp, 0x90000
     mov ebp, esp
     
-    mov dword [0xB8000], 0x4F4B4F4B
+    mov dword [0xB8000], 0x4F504F4D
     mov dword [0xB8004], 0x4F204F20
     
-    jmp 0x08:0x8000
+    call 0x8000
 
 [BITS 16]
 

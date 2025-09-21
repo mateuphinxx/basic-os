@@ -6,7 +6,6 @@ static idt_entry_t idt_entries[IDT_ENTRIES];
 static idt_ptr_t idt_ptr;
 static isr_t interrupt_handlers[IDT_ENTRIES];
 
-
 extern void isr0(void);
 extern void isr1(void);
 extern void isr2(void);

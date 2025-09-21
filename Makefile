@@ -5,7 +5,7 @@ LDFLAGS = -m elf_i386 -T link.ld
 ASMFLAGS = -f elf32
 
 BUILD_DIR = build_output
-SOURCES_C = kernel/main.c drivers/vga.c drivers/keyboard.c memory/memory.c interrupts/idt.c shell/shell.c
+SOURCES_C = kernel/main.c drivers/vga.c drivers/keyboard.c memory/memory.c interrupts/idt.c shell/shell.c commands/command.c commands/help.c commands/ping.c commands/color.c commands/system.c commands/info.c
 SOURCES_ASM = kernel/kernel_entry.asm interrupts/interrupt.asm
 OBJECTS_C = $(patsubst %.c,$(BUILD_DIR)/%.o,$(notdir $(SOURCES_C)))
 OBJECTS_ASM = $(patsubst %.asm,$(BUILD_DIR)/%.o,$(notdir $(SOURCES_ASM)))
@@ -42,6 +42,10 @@ $(BUILD_DIR)/%.o: interrupts/%.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/%.o: shell/%.c | $(BUILD_DIR)
+	@echo "Compiling $<..."
+	$(CC) $(CFLAGS) $< -o $@
+
+$(BUILD_DIR)/%.o: commands/%.c | $(BUILD_DIR)
 	@echo "Compiling $<..."
 	$(CC) $(CFLAGS) $< -o $@
 
